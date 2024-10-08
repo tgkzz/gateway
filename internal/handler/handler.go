@@ -3,12 +3,15 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/tgkzz/gateway/internal/service/auth"
+	"golang.org/x/time/rate"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
 type Handler interface {
@@ -27,6 +30,7 @@ type Handler interface {
 
 type EchoHandler struct {
 	authService  auth.IAuthService
+	logger       *slog.Logger
 	echoInstance *echo.Echo
 }
 
@@ -35,7 +39,7 @@ func NewEchoHandler(authPort string, logger *slog.Logger) (Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &EchoHandler{authService: authService}, nil
+	return &EchoHandler{authService: authService, logger: logger}, nil
 }
 
 func (eh *EchoHandler) Stop(ctx context.Context) error {
@@ -79,6 +83,9 @@ func (eh *EchoHandler) routes() *echo.Echo {
 			id := ctx.RealIP()
 			return id, nil
 		},
+		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+			middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(10), Burst: 50, ExpiresIn: 5 * time.Minute},
+		),
 		ErrorHandler: func(context echo.Context, err error) error {
 			return context.JSON(http.StatusForbidden, nil)
 		},
@@ -86,6 +93,28 @@ func (eh *EchoHandler) routes() *echo.Echo {
 			return context.JSON(http.StatusTooManyRequests, nil)
 		},
 	}))
+
+	// prometheus?
+
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Skipper:      middleware.DefaultSkipper,
+		Timeout:      time.Second * 30,
+		ErrorMessage: RequestTimeout,
+		OnTimeoutRouteErrorHandler: func(err error, c echo.Context) {
+			op := fmt.Sprintf("%s", "handler.timeout "+c.Path())
+			deadline, _ := c.Request().Context().Deadline()
+
+			l := eh.logger.With(
+				slog.String("op", op),
+				slog.Time("now", time.Now().UTC()),
+				slog.Time("deadline", deadline),
+			)
+
+			l.Error("request timed out for path: %s", c.Path())
+		},
+	}))
+
+	e.Use(middleware.Secure())
 
 	v1 := e.Group("/v1")
 	{

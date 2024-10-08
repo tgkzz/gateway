@@ -4,6 +4,7 @@ const (
 	UsernameIsEmpty  = "username is empty"
 	PasswordIsEmpty  = "password is empty"
 	CouldNotReadBody = "could not read body"
+	RequestTimeout   = "request timeout"
 )
 
 type ErrorHandler struct {
