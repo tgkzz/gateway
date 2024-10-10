@@ -21,7 +21,7 @@ type Auth struct {
 }
 
 func NewAuthClient(port string, logger *slog.Logger) (AuthClient, error) {
-	conn, err := grpc.Dial(
+	conn, err := grpc.NewClient(
 		fmt.Sprintf(":%s", port),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
