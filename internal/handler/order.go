@@ -2,10 +2,11 @@ package handler
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/tgkzz/gateway/internal/model"
 	"github.com/tgkzz/gateway/internal/service/order"
-	"net/http"
 )
 
 func (eh *EchoHandler) createOrder(c echo.Context) error {

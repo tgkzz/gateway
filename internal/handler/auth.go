@@ -2,8 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 func (eh *EchoHandler) login(ctx echo.Context) error {

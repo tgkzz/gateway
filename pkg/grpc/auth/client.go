@@ -3,11 +3,12 @@ package auth
 import (
 	"context"
 	"fmt"
+	"log/slog"
+
 	authPkg "github.com/tgkzz/auth/gen/go/auth"
 	"github.com/tgkzz/auth/pkg/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log/slog"
 )
 
 type AuthClient interface {

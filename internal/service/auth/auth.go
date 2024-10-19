@@ -2,8 +2,9 @@ package auth
 
 import (
 	"context"
-	"github.com/tgkzz/gateway/pkg/grpc/auth"
 	"log/slog"
+
+	"github.com/tgkzz/gateway/pkg/grpc/auth"
 )
 
 type IAuthService interface {

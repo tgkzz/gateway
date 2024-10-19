@@ -2,9 +2,10 @@ package server
 
 import (
 	"context"
+	"log/slog"
+
 	"github.com/tgkzz/gateway/config"
 	"github.com/tgkzz/gateway/internal/handler"
-	"log/slog"
 )
 
 type HttpServer struct {

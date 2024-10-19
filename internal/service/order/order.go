@@ -3,13 +3,14 @@ package order
 import (
 	"context"
 	"errors"
+	"log/slog"
+	"time"
+
 	"github.com/tgkzz/gateway/internal/model"
 	"github.com/tgkzz/gateway/pkg/grpc/order"
 	"github.com/tgkzz/gateway/pkg/logger"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log/slog"
-	"time"
 )
 
 type IOrderService interface {

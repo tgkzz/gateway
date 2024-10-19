@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+
 	"github.com/tgkzz/gateway/pkg/grpc/order/dto"
 	order1 "github.com/tgkzz/order/gen/go/order"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
-	"log/slog"
 )
 
 type OrderClient interface {
@@ -27,6 +28,7 @@ type Client struct {
 var (
 	ErrEmptyOrderId        = errors.New("order id is empty")
 	ErrCouldNotCreateOrder = errors.New("could not create order, bad arguments")
+	ErrOrderNotFound       = errors.New("order not found")
 )
 
 func NewOrderClient(host, port string, logger *slog.Logger) (OrderClient, error) {
@@ -85,8 +87,14 @@ func (c *Client) GetOrderById(ctx context.Context, orderId string) (*dto.Order, 
 	var res dto.Order
 	resp, err := c.client.GetOrderById(ctx, &order1.GetOrderRequest{OrderId: orderId})
 	if err != nil {
-		log.Error(err.Error())
-		// TODO: add error handling of codes in both services
+		if st, ok := status.FromError(err); ok {
+			log.Error(st.Message(), slog.String("grpc_code", st.Code().String()))
+
+			if st.Code() == codes.NotFound {
+				return nil, ErrOrderNotFound
+			}
+		}
+
 		return nil, err
 	}
 

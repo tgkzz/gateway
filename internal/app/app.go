@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/tgkzz/gateway/config"
-	"github.com/tgkzz/gateway/internal/app/http/server"
 	"log/slog"
 	"net/http"
+
+	"github.com/tgkzz/gateway/config"
+	"github.com/tgkzz/gateway/internal/app/http/server"
 )
 
 type App struct {

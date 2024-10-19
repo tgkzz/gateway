@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -11,9 +15,6 @@ import (
 	"github.com/tgkzz/gateway/internal/service/auth"
 	"github.com/tgkzz/gateway/internal/service/order"
 	"golang.org/x/time/rate"
-	"log/slog"
-	"net/http"
-	"time"
 )
 
 type Handler interface {

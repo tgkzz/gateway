@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/tgkzz/gateway/config"
-	"github.com/tgkzz/gateway/internal/app"
-	logger2 "github.com/tgkzz/gateway/pkg/logger"
 	"log/slog"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/tgkzz/gateway/config"
+	"github.com/tgkzz/gateway/internal/app"
+	logger2 "github.com/tgkzz/gateway/pkg/logger"
 )
 
 const defaultConfigPath = "./gateway.json"
