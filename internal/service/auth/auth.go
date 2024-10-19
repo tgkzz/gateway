@@ -15,8 +15,8 @@ type AuthService struct {
 	cli auth.AuthClient
 }
 
-func NewAuthService(authPort string, logger *slog.Logger) (IAuthService, error) {
-	authCli, err := auth.NewAuthClient(authPort, logger)
+func NewAuthService(authHost, authPort string, logger *slog.Logger) (IAuthService, error) {
+	authCli, err := auth.NewAuthClient(authHost, authPort, logger)
 	if err != nil {
 		return nil, err
 	}

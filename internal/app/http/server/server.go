@@ -12,7 +12,7 @@ type HttpServer struct {
 }
 
 func NewHttpServer(cfg config.Config, logger *slog.Logger) (*HttpServer, error) {
-	h, err := handler.NewEchoHandler(cfg.AuthServer.Port, logger)
+	h, err := handler.NewEchoHandler(cfg, logger)
 	if err != nil {
 		return nil, err
 	}

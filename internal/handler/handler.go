@@ -7,7 +7,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/tgkzz/gateway/config"
 	"github.com/tgkzz/gateway/internal/service/auth"
+	"github.com/tgkzz/gateway/internal/service/order"
 	"golang.org/x/time/rate"
 	"log/slog"
 	"net/http"
@@ -30,16 +32,25 @@ type Handler interface {
 
 type EchoHandler struct {
 	authService  auth.IAuthService
+	orderService order.IOrderService
 	logger       *slog.Logger
 	echoInstance *echo.Echo
 }
 
-func NewEchoHandler(authPort string, logger *slog.Logger) (Handler, error) {
-	authService, err := auth.NewAuthService(authPort, logger)
+func NewEchoHandler(cfg config.Config, logger *slog.Logger) (Handler, error) {
+	authService, err := auth.NewAuthService(cfg.AuthServer.Host, cfg.AuthServer.Port, logger)
 	if err != nil {
 		return nil, err
 	}
-	return &EchoHandler{authService: authService, logger: logger}, nil
+	orderService, err := order.NewOrderService(cfg.OrderServer.Host, cfg.OrderServer.Port, logger)
+	if err != nil {
+		return nil, err
+	}
+	return &EchoHandler{
+		authService:  authService,
+		logger:       logger,
+		orderService: orderService,
+	}, nil
 }
 
 func (eh *EchoHandler) Stop(ctx context.Context) error {
@@ -110,7 +121,7 @@ func (eh *EchoHandler) routes() *echo.Echo {
 				slog.Time("deadline", deadline),
 			)
 
-			l.Error("request timed out for path: %s", c.Path())
+			l.Error("request timed out for path", slog.String("path", c.Path()))
 		},
 	}))
 

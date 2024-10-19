@@ -22,7 +22,7 @@ func (eh *EchoHandler) login(ctx echo.Context) error {
 		return eh.errorHandler(err)
 	}
 
-	return ctx.JSON(http.StatusNonAuthoritativeInfo, token)
+	return ctx.JSON(http.StatusOK, token)
 }
 
 func (eh *EchoHandler) register(ctx echo.Context) error {

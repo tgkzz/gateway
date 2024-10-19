@@ -20,9 +20,9 @@ type Auth struct {
 	logger *slog.Logger
 }
 
-func NewAuthClient(port string, logger *slog.Logger) (AuthClient, error) {
+func NewAuthClient(host, port string, logger *slog.Logger) (AuthClient, error) {
 	conn, err := grpc.NewClient(
-		fmt.Sprintf(":%s", port),
+		fmt.Sprintf("%s:%s", host, port),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

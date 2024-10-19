@@ -7,13 +7,18 @@ import (
 )
 
 type Config struct {
-	Env        string        `json:"env"`
-	Host       string        `json:"host"`
-	Port       string        `json:"port"`
-	AuthServer AuthServerCfg `json:"auth_server"`
+	Env         string         `json:"env"`
+	Port        string         `json:"port"`
+	AuthServer  AuthServerCfg  `json:"auth_server"`
+	OrderServer OrderServerCfg `json:"order_server"`
 }
 
 type AuthServerCfg struct {
+	Host string `json:"host"`
+	Port string `json:"port"`
+}
+
+type OrderServerCfg struct {
 	Host string `json:"host"`
 	Port string `json:"port"`
 }
