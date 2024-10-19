@@ -2,9 +2,12 @@ package order
 
 import (
 	"context"
+	"errors"
 	"github.com/tgkzz/gateway/internal/model"
 	"github.com/tgkzz/gateway/pkg/grpc/order"
 	"github.com/tgkzz/gateway/pkg/logger"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log/slog"
 	"time"
 )
@@ -18,6 +21,11 @@ type OrderService struct {
 	cli    order.OrderClient
 	logger *slog.Logger
 }
+
+var (
+	ErrOrderNotFound    = errors.New("order not found")
+	ErrInvalidArguments = errors.New("invalid arguments")
+)
 
 func NewOrderService(orderHost, orderPort string, logger *slog.Logger) (IOrderService, error) {
 	orderCli, err := order.NewOrderClient(orderHost, orderPort, logger)
@@ -42,6 +50,13 @@ func (or *OrderService) CreateOrder(c context.Context, order model.Order) (strin
 	orderId, err := or.cli.CreateOrder(ctx, order.ToDtoOrder())
 	if err != nil {
 		log.Error("failed to create order in orderService", logger.Err(err))
+		if st, ok := status.FromError(err); ok {
+			log.Error(st.Message(), slog.String("grpc_code", st.Code().String()))
+
+			if st.Code() == codes.InvalidArgument {
+				return "", ErrInvalidArguments
+			}
+		}
 		return "", err
 	}
 
@@ -65,6 +80,13 @@ func (or *OrderService) GetOrderById(c context.Context, orderId string) (model.O
 	resp, err := or.cli.GetOrderById(ctx, orderId)
 	if err != nil {
 		log.Error("failed to get order in orderService", logger.Err(err))
+		if st, ok := status.FromError(err); ok {
+			log.Error(st.Message(), slog.String("grpc_code", st.Code().String()))
+
+			if st.Code() == codes.NotFound {
+				return model.Order{}, ErrOrderNotFound
+			}
+		}
 		return model.Order{}, err
 	}
 

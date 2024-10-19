@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"github.com/tgkzz/gateway/internal/model"
+	"github.com/tgkzz/gateway/internal/service/order"
 	"net/http"
 )
 
@@ -14,6 +16,9 @@ func (eh *EchoHandler) createOrder(c echo.Context) error {
 
 	orderId, err := eh.orderService.CreateOrder(c.Request().Context(), req)
 	if err != nil {
+		if errors.Is(err, order.ErrInvalidArguments) {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
 		return eh.errorHandler(err)
 	}
 
@@ -31,6 +36,9 @@ func (eh *EchoHandler) getOrder(c echo.Context) error {
 
 	res, err := eh.orderService.GetOrderById(c.Request().Context(), orderId)
 	if err != nil {
+		if errors.Is(err, order.ErrOrderNotFound) {
+			return c.String(http.StatusNotFound, err.Error())
+		}
 		return eh.errorHandler(err)
 	}
 
