@@ -81,13 +81,7 @@ func (or *OrderService) GetOrderById(c context.Context, orderId string) (model.O
 	resp, err := or.cli.GetOrderById(ctx, orderId)
 	if err != nil {
 		log.Error("failed to get order in orderService", logger.Err(err))
-		if st, ok := status.FromError(err); ok {
-			log.Error(st.Message(), slog.String("grpc_code", st.Code().String()))
 
-			if st.Code() == codes.NotFound {
-				return model.Order{}, ErrOrderNotFound
-			}
-		}
 		return model.Order{}, err
 	}
 

@@ -111,6 +111,7 @@ func (c *Client) DeleteOrderById(ctx context.Context, orderId string) error {
 		slog.Any("orderId", orderId),
 	)
 
+	//TODO: add status code view
 	if _, err := c.client.DeleteOrderById(
 		ctx,
 		&order1.DeleteOrderRequest{
